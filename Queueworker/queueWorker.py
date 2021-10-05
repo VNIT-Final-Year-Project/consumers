@@ -43,6 +43,7 @@ class Queueworker():
                 X = element[0]
                 Y = element[1]
                 result = fastComputation.lcs(X,Y)
+                result = [element[2],result]
                 self.producer_q.append(result)
 
 
