@@ -20,7 +20,7 @@ class Queueworker():
             body = json.loads(body)
             self.consumer_q.append(body)
 
-        channel.basic_consume(queue="server1", on_message_callback=callback, auto_ack=True)
+        channel.basic_consume(queue="Server1", on_message_callback=callback, auto_ack=True)
         channel.start_consuming()
 
     def produce(self):
@@ -31,12 +31,14 @@ class Queueworker():
             if(len(self.producer_q)>0):
                 element = self.producer_q.pop(0)
                 print(element)
+                json_string = json.dumps(element)
                 channel.basic_publish(exchange='output_exchange',
-                                      routing_key='output', body=bytes(element))
+                                      routing_key='output', body=json_string)
 
     def calculate(self):
         while(True):
             if(len(self.consumer_q)>0):
+                print('calculating')
                 element = self.consumer_q.pop(0)
                 X = element[0]
                 Y = element[1]
