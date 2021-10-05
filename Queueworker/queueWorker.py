@@ -1,5 +1,6 @@
 # consumer.py
 # Consume RabbitMQ queue
+import threading
 
 import pika
 import json
@@ -9,6 +10,7 @@ class Queueworker():
     def __init__(self):
         self.producer_q = []
         self.consumer_q = []
+        self.threadlock = threading.Lock()
 
     def consume(self):
         connection = pika.BlockingConnection(
@@ -37,9 +39,10 @@ class Queueworker():
 
     def calculate(self):
         while(True):
-            if(len(self.consumer_q)>0):
+            if(self.threadlock.acquire() and len(self.consumer_q)>0):
                 print('calculating')
                 element = self.consumer_q.pop(0)
+                self.threadlock.release()
                 X = element[0]
                 Y = element[1]
                 result = fastComputation.lcs(X,Y)
