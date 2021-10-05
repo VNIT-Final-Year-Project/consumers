@@ -4,13 +4,15 @@ import threading
 
 import pika
 import json
-from Queueworker.fastComputation.fastComputation import fastComputation
+from Queueworker.fastComputation.fastComputation import lcs
+from numba import jit
 
 class Queueworker():
     def __init__(self):
         self.producer_q = []
         self.consumer_q = []
         self.threadlock = threading.Lock()
+        self.func =jit()(lcs)
 
     def consume(self):
         connection = pika.BlockingConnection(
@@ -46,7 +48,7 @@ class Queueworker():
                 self.threadlock.release()
                 X = element[0]
                 Y = element[1]
-                result = fastComputation.lcs(X,Y)
+                result = self.func(X,Y)
                 result = [element[2],result]
                 self.producer_q.append(result)
             else:
