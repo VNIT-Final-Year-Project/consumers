@@ -39,7 +39,8 @@ class Queueworker():
 
     def calculate(self):
         while(True):
-            if(self.threadlock.acquire() and len(self.consumer_q)>0):
+            self.threadlock.acquire()
+            if(len(self.consumer_q)>0):
                 print('calculating')
                 element = self.consumer_q.pop(0)
                 self.threadlock.release()
@@ -48,6 +49,8 @@ class Queueworker():
                 result = fastComputation.lcs(X,Y)
                 result = [element[2],result]
                 self.producer_q.append(result)
+            else:
+                self.threadlock.release()
 
 
 
